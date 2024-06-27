@@ -32,7 +32,7 @@ api:
 
 ota:
   - platform: esphome
-    id: waveshare-esp32-s3-relay-6ch_ota
+    id: waveshare_esp32_s3_relay_6ch_ota
 
 wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
