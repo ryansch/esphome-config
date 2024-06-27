@@ -9,7 +9,7 @@ esphome:
   area: ${area}
   name_add_mac_suffix: true
   project:
-    name: adafruit.feather.esp32s3
+    name: adafruit.feather-esp32s3
     version: 1.0.0
   on_boot:
     then:
