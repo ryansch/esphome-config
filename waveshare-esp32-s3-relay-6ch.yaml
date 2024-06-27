@@ -1,5 +1,5 @@
 substitutions:
-  name: waveshare-esp32-s3-relay-6ch
+  name: waveshare-esp32-relay
   friendly_name: Waveshare Relay Board
   area: ""
 
