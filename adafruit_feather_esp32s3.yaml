@@ -9,8 +9,8 @@ esphome:
   area: ${area}
   name_add_mac_suffix: true
   project:
-    name: adafruit.feather
-    version: esp32s3
+    name: adafruit.feather.esp32s3
+    version: 1.0.0
   on_boot:
     then:
       - switch.turn_on: i2c_power
@@ -39,6 +39,7 @@ api:
 
 ota:
   - platform: esphome
+    id: adafruit_feather_esp32s3_ota
 
 wifi:
   on_connect:
