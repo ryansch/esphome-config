@@ -27,10 +27,8 @@ external_components:
 esp32:
   board: adafruit_feather_esp32s3
   framework:
-    type: arduino
+    type: esp-idf
     version: recommended
-
-logger:
 
 mdns:
   disabled: false
@@ -106,18 +104,18 @@ binary_sensor:
         then:
           - logger.log: "Boot Button Single Long Clicked"
           - button.press: safe_mode_button
-      - timing:
-          - ON for at most 1s
-          - OFF for at least 0.5s
-        then:
-          - logger.log: "Boot Button Single Short Clicked"
-          - light.turn_on:
-              id: rgb_led
-              brightness: 100%
-              red: 100%
-              green: 100%
-              blue: 100%
-              flash_length: 3s
+      # - timing:
+      #     - ON for at most 1s
+      #     - OFF for at least 0.5s
+      #   then:
+      #     - logger.log: "Boot Button Single Short Clicked"
+      #     - light.turn_on:
+      #         id: rgb_led
+      #         brightness: 100%
+      #         red: 100%
+      #         green: 100%
+      #         blue: 100%
+      #         flash_length: 3s
 
 button:
   - platform: restart
@@ -129,6 +127,11 @@ button:
     name: "Safe Mode"
     id: safe_mode_button
     entity_category: config
+
+  # - platform: max17048
+  #   name: "Reset"
+  #   id: reset_button
+  #   entity_category: config
 
 sensor:
   - platform: uptime
@@ -174,36 +177,9 @@ text_sensor:
       name: "Mac Address"
       entity_category: diagnostic
 
-  #  Creates a sensor showing when the device was last restarted
-  - platform: template
-    name: "Last Restart"
-    id: device_last_restart
-    icon: mdi:clock
+  - platform: uptime
+    name: Uptime
     entity_category: diagnostic
-
-  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
-  - platform: template
-    name: "Uptime"
-    entity_category: diagnostic
-    lambda: |-
-      int seconds = (id(uptime_sensor).state);
-      int days = seconds / (24 * 3600);
-      seconds = seconds % (24 * 3600);
-      int hours = seconds / 3600;
-      seconds = seconds % 3600;
-      int minutes = seconds /  60;
-      seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return { "Starting up" };
-      } else if ( days ) {
-        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( hours ) {
-        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( minutes ) {
-        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else {
-        return { (String(seconds) +"s").c_str() };
-      }
     icon: mdi:clock-start
 
 light:
@@ -214,13 +190,13 @@ light:
     pin:
       number: GPIO13
 
-  - platform: neopixelbus
-    type: GRB
-    variant: 800KBPS
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    name: "RGB LED"
+    rgb_order: GRB
     pin: GPIO33
     num_leds: 1
-    name: "RGB LED"
-    id: rgb_led
+    chipset: SK6812 # All chipsets worked, this one has the tightest timing.
     on_turn_on:
       then:
         - switch.turn_on: neopixel_power
