@@ -15,7 +15,8 @@ esphome:
 esp32:
   board: esp32-s3-devkitc-1
   framework:
-    type: arduino
+    type: esp-idf
+    version: recommended
 
 # Enable logging
 logger:
@@ -128,13 +129,13 @@ rtttl:
   gain: 30%
 
 light:
-  - platform: neopixelbus
-    type: RGB
-    variant: 800KBPS
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    name: "RGB LED"
+    rgb_order: RGB
     pin: GPIO38
     num_leds: 1
-    name: "RGB LED"
-    id: rgb_led
+    chipset: WS2812
 
 button:
   - platform: restart
