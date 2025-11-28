@@ -23,6 +23,7 @@ external_components:
       url: https://github.com/ryansch/esphome
       ref: add-max17048
     components: [max17048]
+    refresh: 1s
 
 esp32:
   board: adafruit_feather_esp32s3
@@ -60,6 +61,7 @@ dashboard_import:
   package_import_url: github://ryansch/esphome-config/adafruit_feather_esp32s3.yaml
 
 psram:
+  mode: octal
 
 # spi:
 #   clk_pin: GPIO36
