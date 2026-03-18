@@ -1,0 +1,223 @@
+substitutions:
+  name: waveshare-esp32-relay-8
+  friendly_name: Waveshare Relay Board 2
+  area: ""
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  area: ${area}
+  name_add_mac_suffix: true
+  project:
+    name: waveshare.esp32-s3-eth-8di-8ro
+    version: 1.0.0
+
+esp32:
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+    version: recommended
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  services:
+    - service: play_rtttl
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda "return song_str;"
+
+ota:
+  - platform: esphome
+    id: waveshare_esp32_s3_relay_6ch_ota
+
+wifi:
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap: {}
+
+captive_portal:
+
+web_server:
+  port: 80
+
+dashboard_import:
+  package_import_url: github://ryansch/esphome-config/waveshare-esp32-s3-eth-8di-8ro.yaml
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+  - platform: gpio
+    name: "Boot Button"
+    pin:
+      number: 0
+      ignore_strapping_warning: true
+      mode:
+        input: true
+      inverted: true
+    disabled_by_default: true
+    on_press:
+      then:
+        - button.press: restart_button
+
+text_sensor:
+  - platform: version
+    name: "Firmware Version"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+    ssid:
+      name: "Connected SSID"
+      entity_category: diagnostic
+    mac_address:
+      name: "Mac Address"
+      entity_category: diagnostic
+
+i2c:
+  sda: GPIO42
+  scl: GPIO41
+
+pca9554:
+  - id: tca99554pwr
+    address: 0x20
+    pin_count: 8
+
+switch:
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 0
+      mode:
+        output: true
+    id: relay1
+    name: Relay 1
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 1
+      mode:
+        output: true
+    id: relay2
+    name: Relay 2
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 2
+      mode:
+        output: true
+    id: relay3
+    name: Relay 3
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 3
+      mode:
+        output: true
+    id: relay4
+    name: Relay 4
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 4
+      mode:
+        output: true
+    id: relay5
+    name: Relay 5
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 5
+      mode:
+        output: true
+    id: relay6
+    name: Relay 6
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 6
+      mode:
+        output: true
+    id: relay7
+    name: Relay 7
+
+  - platform: gpio
+    pin:
+      pca9554: tca99554pwr
+      number: 7
+      mode:
+        output: true
+    id: relay8
+    name: Relay 8
+
+uart:
+  tx_pin: GPIO17
+  rx_pin: GPIO18
+  baud_rate: 115200
+
+# buzzer
+output:
+  - platform: ledc
+    pin: GPIO46
+    id: buzzer
+
+rtttl:
+  output: buzzer
+  id: rtttl_buzzer
+  gain: 30%
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    name: "RGB LED"
+    rgb_order: RGB
+    pin: GPIO38
+    num_leds: 1
+    chipset: WS2812
+
+button:
+  - platform: restart
+    name: "Restart"
+    id: restart_button
+    entity_category: config
+
+  - platform: factory_reset
+    name: "Factory Reset"
+    id: reset
+    entity_category: config
+
+  - platform: safe_mode
+    name: "Safe Mode"
+    internal: false
+    entity_category: config
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: diagnostic
+
+  # Reports the WiFi signal strength in %
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Strength"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: diagnostic
